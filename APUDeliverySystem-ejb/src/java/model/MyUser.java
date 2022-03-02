@@ -22,7 +22,6 @@ public class MyUser implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private String id;
-//    private String email;
     private String pswd;
     private String fullName;
     private String address;
@@ -40,7 +39,6 @@ public class MyUser implements Serializable {
             int ic,
             String userRole) {
         this.id = id;
-//        this.email = email;
         this.pswd = pswd;
         this.fullName = fullName;
         this.address = address;
@@ -48,14 +46,6 @@ public class MyUser implements Serializable {
         this.ic = ic;
         this.userRole = userRole;
     }
-
-//    public String getEmail() {
-//        return email;
-//    }
-//
-//    public void setEmail(String email) {
-//        this.email = email;
-//    }
 
     public String getPswd() {
         return pswd;

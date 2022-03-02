@@ -13,6 +13,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import model.MyUser;
 import model.UserFacade;
 
@@ -20,19 +21,21 @@ import model.UserFacade;
  *
  * @author banamaher
  */
-@WebServlet(name = "Signup", urlPatterns = {"/Signup"})
-public class Signup extends HttpServlet {
+@WebServlet(name = "Login", urlPatterns = {"/Login"})
+public class Login extends HttpServlet {
 
     @EJB
     private UserFacade userFacade;
 
+    
+    
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
      * methods.
      *
-     * @param request server request
-     * @param response server response
-     * @throws ServletException if a server-specific error occurs
+     * @param request servlet request
+     * @param response servlet response
+     * @throws ServletException if a servlet-specific error occurs
      * @throws IOException if an I/O error occurs
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
@@ -41,34 +44,35 @@ public class Signup extends HttpServlet {
         
         String email = request.getParameter("email");
         String pswd = request.getParameter("pswd");
-        String fullName = request.getParameter("fullName");
-        String address = request.getParameter("address");
-        int phone = Integer.parseInt(request.getParameter("phone"));
-        int icNum = Integer.parseInt(request.getParameter("ic"));        
-        
+        String userRole = request.getParameter("userRoleParam");
         MyUser found = userFacade.find(email);
-        request.getRequestDispatcher("signup.jsp").include(request, response);
         
         
         
-        try (PrintWriter out = response.getWriter()) {             
-            String userRole = request.getAttribute("userRoleParam").toString();
-            if(found == null){
-                MyUser newUser = new MyUser(email,
-                                    pswd,
-                                    fullName,
-                                    address,
-                                    phone,
-                                    icNum,
-                                    userRole);
-                
-                 userFacade.create(newUser);
-                out.println("<br> Registration Done!");
+        try (PrintWriter out = response.getWriter()) {
+            if(found != null) {
+                if (pswd == found.getPswd()) {
+                    HttpSession currSession = request.getSession();
+                    currSession.setAttribute("loggedIn", found);
+                    if (found.getUserRole() == "customer") {
+                        request.getRequestDispatcher("customerHome");
+                    } else if(found.getUserRole() == "manager") {
+                        request.getRequestDispatcher("managerHome");
+                    } else {
+                        request.getRequestDispatcher("deliveryHome");
+                    }
+                } else {
+                    request.getRequestDispatcher("login.jsp")
+                        .include(request, response);
+                out.println("<br><br> Incorrect Password!");
+                }
             } else {
-                out.println("<br> The username has been registered!");
+                request.getRequestDispatcher("login.jsp")
+                        .include(request, response);
+                out.println("<br><br> Email not registered, please register!");
             }
+            
         }
-        
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">

@@ -5,6 +5,10 @@
 --%>
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
+
+<% String servletParam = "customer";
+request.setAttribute("userRoleParam",servletParam);
+%>
 <!DOCTYPE html>
 <html>
     <head>
